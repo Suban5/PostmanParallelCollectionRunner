@@ -1,0 +1,504 @@
+{
+  "info": {
+    "_postman_id": "5fb2a790-49fb-42cf-a23e-58b08a2c4667",
+    "name": "FakeStore API CRUD with Authentication",
+    "description": "A comprehensive API test collection for FakeStore API with authentication and products CRUD operations including negative tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3186668"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "POST /auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Response has token\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"token\");",
+                  "  pm.expect(json.token).to.be.a(\"string\");",
+                  "  pm.collectionVariables.set(\"token\", json.token);",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"token\"],",
+                  "  properties: {",
+                  "    token: { type: \"string\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));",
+                  "",
+                  "// Negative test: verify token is not empty",
+                  "pm.test(\"Token is not empty\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.token.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"mor_2314\",\n  \"password\": \"83r5^_\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /auth/login - Invalid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Invalid credentials returns error\", () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 401, 403]);",
+                  "});",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"invaliduser\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products CRUD",
+      "item": [
+        {
+          "name": "GET /products",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get(\"token\");",
+                  "if (token) {",
+                  "  pm.request.headers.add({ key: \"Authorization\", value: \"Bearer \" + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Response is an array of products\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an(\"array\");",
+                  "  pm.expect(json.length).to.be.greaterThan(0);",
+                  "});",
+                  "pm.test(\"Each product has required fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  json.forEach(product => {",
+                  "    pm.expect(product).to.have.property(\"id\");",
+                  "    pm.expect(product).to.have.property(\"title\");",
+                  "    pm.expect(product).to.have.property(\"price\");",
+                  "    pm.expect(product).to.have.property(\"category\");",
+                  "    pm.expect(product).to.have.property(\"image\");",
+                  "  });",
+                  "});",
+                  "pm.test(\"Data types are correct\", () => {",
+                  "  const json = pm.response.json();",
+                  "  if (json.length > 0) {",
+                  "    pm.expect(json[0].id).to.be.a(\"number\");",
+                  "    pm.expect(json[0].title).to.be.a(\"string\");",
+                  "    pm.expect(json[0].price).to.be.a(\"number\");",
+                  "  }",
+                  "});",
+                  "const schema = {",
+                  "  type: \"array\",",
+                  "  items: {",
+                  "    type: \"object\",",
+                  "    required: [\"id\", \"title\", \"price\", \"category\"],",
+                  "    properties: {",
+                  "      id: { type: \"number\" },",
+                  "      title: { type: \"string\" },",
+                  "      price: { type: \"number\" },",
+                  "      category: { type: \"string\" }",
+                  "    }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /products/:id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get(\"token\");",
+                  "if (token) {",
+                  "  pm.request.headers.add({ key: \"Authorization\", value: \"Bearer \" + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Product has required fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json).to.have.property(\"title\");",
+                  "  pm.expect(json).to.have.property(\"price\");",
+                  "  pm.expect(json).to.have.property(\"description\");",
+                  "  pm.expect(json).to.have.property(\"category\");",
+                  "  pm.expect(json).to.have.property(\"image\");",
+                  "  pm.expect(json).to.have.property(\"rating\");",
+                  "});",
+                  "pm.test(\"Product ID matches requested ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get(\"product_id\")));",
+                  "});",
+                  "pm.test(\"Rating has required structure\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.rating).to.have.property(\"rate\");",
+                  "  pm.expect(json.rating).to.have.property(\"count\");",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"id\", \"title\", \"price\", \"description\", \"category\", \"image\", \"rating\"],",
+                  "  properties: {",
+                  "    id: { type: \"number\" },",
+                  "    title: { type: \"string\" },",
+                  "    price: { type: \"number\" },",
+                  "    description: { type: \"string\" },",
+                  "    category: { type: \"string\" },",
+                  "    image: { type: \"string\" },",
+                  "    rating: {",
+                  "      type: \"object\",",
+                  "      required: [\"rate\", \"count\"],",
+                  "      properties: {",
+                  "        rate: { type: \"number\" },",
+                  "        count: { type: \"number\" }",
+                  "      }",
+                  "    }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));",
+                  "",
+                  "// Negative test: invalid ID",
+                  "pm.test(\"Response is not null\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.be.null;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /products",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get(\"token\");",
+                  "if (token) {",
+                  "  pm.request.headers.add({ key: \"Authorization\", value: \"Bearer \" + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Created product has ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json.id).to.be.a(\"number\");",
+                  "  pm.collectionVariables.set(\"created_product_id\", json.id);",
+                  "});",
+                  "pm.test(\"Created product matches payload\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.title).to.eql(\"Test Product\");",
+                  "  pm.expect(json.price).to.eql(29.99);",
+                  "  pm.expect(json.category).to.eql(\"electronics\");",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"id\", \"title\", \"price\"],",
+                  "  properties: {",
+                  "    id: { type: \"number\" },",
+                  "    title: { type: \"string\" },",
+                  "    price: { type: \"number\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Product\",\n  \"price\": 29.99,\n  \"description\": \"A test product created via Postman automation\",\n  \"image\": \"https://i.pravatar.cc/150\",\n  \"category\": \"electronics\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /products/:id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get(\"token\");",
+                  "if (token) {",
+                  "  pm.request.headers.add({ key: \"Authorization\", value: \"Bearer \" + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Product was updated with correct values\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.title).to.eql(\"Updated Product Title\");",
+                  "  pm.expect(json.price).to.eql(59.99);",
+                  "  pm.expect(json.description).to.eql(\"Updated description via Postman\");",
+                  "});",
+                  "pm.test(\"Updated product has ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Product Title\",\n  \"price\": 59.99,\n  \"description\": \"Updated description via Postman\",\n  \"image\": \"https://i.pravatar.cc/150\",\n  \"category\": \"electronics\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /products/:id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get(\"token\");",
+                  "if (token) {",
+                  "  pm.request.headers.add({ key: \"Authorization\", value: \"Bearer \" + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Deleted product data is returned\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json).to.have.property(\"title\");",
+                  "});",
+                  "",
+                  "// Negative test: Unauthorized access",
+                  "pm.test(\"Response is not unauthorized\", () => {",
+                  "  pm.expect(pm.response.code).to.not.eql(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "// Reusable test utility available to all requests",
+          "pm.globals.set(\"testUtils\", `",
+          "  const utils = {",
+          "    validateStatus: (expected) => pm.test(\"Status code is \" + expected, () => pm.response.to.have.status(expected)),",
+          "    validateResponseTime: () => pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000)),",
+          "    validateSchema: (schema) => pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema)),",
+          "    validateHasProperty: (obj, prop) => pm.expect(obj).to.have.property(prop)",
+          "  };",
+          "`);"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://fakestoreapi.com"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": "1"
+    }
+  ]
+}

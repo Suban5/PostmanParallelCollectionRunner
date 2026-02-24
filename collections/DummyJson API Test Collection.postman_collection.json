@@ -1,0 +1,865 @@
+{
+  "info": {
+    "_postman_id": "d7576461-1750-474f-8f85-dd42a5e4c2bb",
+    "name": "DummyJson API Test Collection",
+    "description": "A comprehensive API test collection for DummyJson API with authentication, products, and users CRUD operations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3186668"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Response has token\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"accessToken\");",
+                  "  pm.expect(json.accessToken).to.be.a(\"string\");",
+                  "  pm.collectionVariables.set(\"token\", json.accessToken);",
+                  "});",
+                  "pm.test(\"Response has user info\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json).to.have.property(\"username\");",
+                  "  pm.expect(json).to.have.property(\"email\");",
+                  "});",
+                  "",
+                  "// JSON Schema Validation",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"accessToken\", \"id\", \"username\", \"email\"],",
+                  "  properties: {",
+                  "    accessToken: { type: \"string\" },",
+                  "    id: { type: \"number\" },",
+                  "    username: { type: \"string\" },",
+                  "    email: { type: \"string\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => {",
+                  "  pm.response.to.have.jsonSchema(schema);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"emilys\",\n  \"password\": \"emilyspass\",\n  \"expiresInMins\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"emilys\",\n  \"password\": \"emilyspass\",\n  \"expiresInMins\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "GET /products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Response has products array\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"products\");",
+                  "  pm.expect(json.products).to.be.an(\"array\");",
+                  "  pm.expect(json.products.length).to.be.greaterThan(0);",
+                  "});",
+                  "pm.test(\"Each product has required fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  json.products.forEach(product => {",
+                  "    pm.expect(product).to.have.property(\"id\");",
+                  "    pm.expect(product).to.have.property(\"title\");",
+                  "    pm.expect(product).to.have.property(\"price\");",
+                  "    pm.expect(product).to.have.property(\"category\");",
+                  "  });",
+                  "});",
+                  "pm.test(\"Response has pagination info\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"total\");",
+                  "  pm.expect(json).to.have.property(\"skip\");",
+                  "  pm.expect(json).to.have.property(\"limit\");",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"products\", \"total\", \"skip\", \"limit\"],",
+                  "  properties: {",
+                  "    products: { type: \"array\" },",
+                  "    total: { type: \"number\" },",
+                  "    skip: { type: \"number\" },",
+                  "    limit: { type: \"number\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /products/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Product has required fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json).to.have.property(\"title\");",
+                  "  pm.expect(json).to.have.property(\"price\");",
+                  "  pm.expect(json).to.have.property(\"description\");",
+                  "  pm.expect(json).to.have.property(\"category\");",
+                  "  pm.expect(json).to.have.property(\"stock\");",
+                  "});",
+                  "pm.test(\"Data types are correct\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.be.a(\"number\");",
+                  "  pm.expect(json.title).to.be.a(\"string\");",
+                  "  pm.expect(json.price).to.be.a(\"number\");",
+                  "  pm.expect(json.stock).to.be.a(\"number\");",
+                  "});",
+                  "pm.test(\"Product ID matches requested ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get(\"product_id\")));",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"id\", \"title\", \"price\", \"description\", \"category\", \"stock\"],",
+                  "  properties: {",
+                  "    id: { type: \"number\" },",
+                  "    title: { type: \"string\" },",
+                  "    price: { type: \"number\" },",
+                  "    description: { type: \"string\" },",
+                  "    category: { type: \"string\" },",
+                  "    stock: { type: \"number\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /products/search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Search returns results\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"products\");",
+                  "  pm.expect(json.products).to.be.an(\"array\");",
+                  "});",
+                  "pm.test(\"Search results contain query term\", () => {",
+                  "  const json = pm.response.json();",
+                  "  if (json.products.length > 0) {",
+                  "    json.products.forEach(product => {",
+                  "      const titleOrDesc = (product.title + \" \" + product.description).toLowerCase();",
+                  "      pm.expect(titleOrDesc).to.include(\"phone\");",
+                  "    });",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/search?q=phone",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "phone"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /products/add",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Created product has ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json.id).to.be.a(\"number\");",
+                  "});",
+                  "pm.test(\"Created product matches payload\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.price).to.eql(99.99);",
+                  "  pm.expect(json.category).to.eql(\"smartphones\");",
+                  "  pm.expect(json.stock).to.eql(50);",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"id\", \"title\", \"price\"],",
+                  "  properties: {",
+                  "    id: { type: \"number\" },",
+                  "    title: { type: \"string\" },",
+                  "    price: { type: \"number\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{$randomProductName}}\",\n  \"price\": 99.99,\n  \"description\": \"A test product added via Postman\",\n  \"category\": \"smartphones\",\n  \"stock\": 50,\n  \"rating\": 4.5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /products/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Product was updated\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.title).to.eql(\"Updated Product Title\");",
+                  "  pm.expect(json.price).to.eql(149.99);",
+                  "});",
+                  "pm.test(\"Updated product has ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Product Title\",\n  \"price\": 149.99\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /products/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Deleted product has isDeleted flag\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"isDeleted\");",
+                  "  pm.expect(json.isDeleted).to.be.true;",
+                  "});",
+                  "pm.test(\"Deleted product has deletedOn timestamp\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"deletedOn\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Response has users array\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"users\");",
+                  "  pm.expect(json.users).to.be.an(\"array\");",
+                  "  pm.expect(json.users.length).to.be.greaterThan(0);",
+                  "});",
+                  "pm.test(\"Each user has required fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  json.users.forEach(user => {",
+                  "    pm.expect(user).to.have.property(\"id\");",
+                  "    pm.expect(user).to.have.property(\"firstName\");",
+                  "    pm.expect(user).to.have.property(\"lastName\");",
+                  "    pm.expect(user).to.have.property(\"email\");",
+                  "  });",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"users\", \"total\", \"skip\", \"limit\"],",
+                  "  properties: {",
+                  "    users: { type: \"array\" },",
+                  "    total: { type: \"number\" },",
+                  "    skip: { type: \"number\" },",
+                  "    limit: { type: \"number\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /users/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"User has required fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json).to.have.property(\"firstName\");",
+                  "  pm.expect(json).to.have.property(\"lastName\");",
+                  "  pm.expect(json).to.have.property(\"email\");",
+                  "  pm.expect(json).to.have.property(\"username\");",
+                  "  pm.expect(json).to.have.property(\"phone\");",
+                  "});",
+                  "pm.test(\"Data types are correct\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.be.a(\"number\");",
+                  "  pm.expect(json.firstName).to.be.a(\"string\");",
+                  "  pm.expect(json.email).to.be.a(\"string\");",
+                  "});",
+                  "pm.test(\"User ID matches requested ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get(\"user_id\")));",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"id\", \"firstName\", \"lastName\", \"email\", \"username\"],",
+                  "  properties: {",
+                  "    id: { type: \"number\" },",
+                  "    firstName: { type: \"string\" },",
+                  "    lastName: { type: \"string\" },",
+                  "    email: { type: \"string\" },",
+                  "    username: { type: \"string\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /users/search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Search returns users array\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"users\");",
+                  "  pm.expect(json.users).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/search?q=John",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "John"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /users/add",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Created user has ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"id\");",
+                  "  pm.expect(json.id).to.be.a(\"number\");",
+                  "});",
+                  "pm.test(\"Created user has correct fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"firstName\");",
+                  "  pm.expect(json).to.have.property(\"email\");",
+                  "});",
+                  "const schema = {",
+                  "  type: \"object\",",
+                  "  required: [\"id\", \"firstName\", \"email\"],",
+                  "  properties: {",
+                  "    id: { type: \"number\" },",
+                  "    firstName: { type: \"string\" },",
+                  "    email: { type: \"string\" }",
+                  "  }",
+                  "};",
+                  "pm.test(\"Schema is valid\", () => pm.response.to.have.jsonSchema(schema));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"age\": 25,\n  \"email\": \"{{$randomEmail}}\",\n  \"username\": \"{{$randomUserName}}\",\n  \"password\": \"Test@1234\",\n  \"phone\": \"{{$randomPhoneNumber}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /users/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"User was updated\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.firstName).to.eql(\"UpdatedName\");",
+                  "  pm.expect(json.email).to.eql(\"updated@email.com\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"UpdatedName\",\n  \"email\": \"updated@email.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /users/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response time < 1000ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test(\"Deleted user has isDeleted flag\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"isDeleted\");",
+                  "  pm.expect(json.isDeleted).to.be.true;",
+                  "});",
+                  "pm.test(\"Deleted user has deletedOn timestamp\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"deletedOn\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://dummyjson.com"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": "1"
+    },
+    {
+      "key": "user_id",
+      "value": "1"
+    }
+  ]
+}

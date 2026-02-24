@@ -1,0 +1,7 @@
+{
+  "collectionsFolder": "./collections",
+  "environment": "./environments/Test.postman_environment.json",
+  "parallel": true,
+  "reporters": "cli,html,json",
+  "exportResultsFolder": "./results/simple"
+}

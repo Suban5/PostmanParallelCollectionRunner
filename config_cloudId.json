@@ -1,0 +1,18 @@
+{
+  "collections": [
+    {
+      "collection": "d7576461-1750-474f-8f85-dd42a5e4c2bb",
+      "environment": "c348c8ad-0003-482b-a965-dee211b75b2a",
+      "output": "dummyJsonResults"
+    },
+    {
+      "collection": "5fb2a790-49fb-42cf-a23e-58b08a2c4667",
+      "environment": "2d0868a2-e3f7-46ea-b06a-8919d4e4faa3",
+      "output": "fakeStoreResults"
+    }
+  ],
+  "parallel": true,
+  "maxConcurrency": 2,                            
+  "reporters": "cli,json,html",
+  "exportResultsFolder": "./results/cloudIdResults"
+}
