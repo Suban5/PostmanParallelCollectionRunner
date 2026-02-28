@@ -1,162 +1,308 @@
-# Postman Parallel Collection Runner
+# 🚀 Postman Parallel Collection Runner
 
-This helper demonstrates how to use a configuration file to drive the [Postman CLI](https://www.postman.com/downloads/postman-cli/) and execute multiple collections.
+Run multiple Postman API collections in parallel from a single configuration file.
+
+<p align="center">
+  <strong>Easy • Fast • Reliable</strong>
+</p>
+
+---
+
+## ✨ Features
+
+- ✅ **Run collections in parallel** - Execute multiple collections simultaneously
+- ✅ **Simple configuration** - Single `config.json` file controls everything
+- ✅ **Multiple environments** - Test across dev, staging, and production
+- ✅ **Auto-discovery** - Automatically finds collections in a folder
+- ✅ **Flexible reporters** - CLI, JSON, HTML, and JUnit output formats
+- ✅ **Easy setup** - Interactive setup wizard with `--init` flag
+- ✅ **Global CLI** - Install once via npm, use everywhere
+
+---
+
+## 📦 Installation
+
+```bash
+npm install -g @suban5/postman-parallel-runner
+```
+
+That's it! You're ready to go.
+
+---
+
+## 🎯 Quick Start (3 Steps)
+
+### 1️⃣ Create a Config
+
+```bash
+postman-parallel --init
+```
+
+Answer a few questions and your config is ready.
+
+### 2️⃣ Validate Your Setup
+
+```bash
+postman-parallel --validate
+```
+
+Ensures everything is configured correctly.
+
+### 3️⃣ Run Your Collections
+
+```bash
+postman-parallel
+```
+
+Results are saved to `./results` by default.
+
+---
+
+## 📚 Documentation
+
+- 📖 **[Quick Start Guide](./docs/QUICK_START.md)** - Get running in 5 minutes
+- ⚙️ **[Configuration Reference](./docs/CONFIGURATION.md)** - All configuration options
+- 💡 **[Usage Examples](./docs/USAGE_EXAMPLES.md)** - Real-world scenarios
+- 🐛 **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Solutions to common issues
+
+---
 
 ## Prerequisites
 
 Before getting started, ensure you have:
 
-- **Node.js 14+** installed (LTS recommended)
-- The **Postman CLI** (`postman`) available on your `PATH`. Install it globally via npm:
+- **Node.js 14+** installed ([Download](https://nodejs.org/))
+- **Postman CLI** - Install with:
 
-```sh
+```bash
 npm install -g postman-cli
 ```
 
-- An API key or interactive login if you intend to run cloud collections/environments
+Verify everything is ready:
 
-Verify the CLI is accessible by running:
-
-```sh
-which postman
-# or
-postman --version
+```bash
+postman-parallel --doctor
 ```
 
-## Why Use a Custom Script?
-
-The Postman CLI alone does not support:
-
-- Specifying a folder path instead of an individual collection file
-- Toggling parallel/serial execution via a configuration file
-- Auto-scanning directories for collections
-
-A Node.js wrapper solves these limitations and provides full control.
+This checks your Node.js version, Postman CLI availability, and overall setup.
+It verifies that the Postman CLI executable is available in your PATH.
 
 ---
 
-## Setup
+## 🎓 How It Works
 
-1. Install Node.js (14 or later).
+### Basic Example
 
-2. Install the Postman CLI globally:
-
-    ```sh
-    npm install -g postman-cli
-    ```
-
-3. Authenticate the CLI if using cloud-based collections or environments.
-
-    ### Authenticate the Postman CLI
-
-        **Option 1: Interactive Login (Browser)**
-
-        ```sh
-        postman login
-        ```
-
-        If `POSTMAN_API_KEY` is set in your environment, it will be used automatically.
-
-        **Option 2: Login Using an API Key**
-
-        ```sh
-        postman login --with-api-key "$POSTMAN_API_KEY"
-        ```
-
-        Replace `$POSTMAN_API_KEY` with your actual key.
-
-        ### Generate an API Key
-
-        1. Open Postman.
-        2. Click your profile/avatar (top-right).
-        3. Go to **Settings → API Keys**.
-        4. Click **Generate API Key** and name it (e.g., CLI Key).
-        5. Copy the key immediately — it is shown only once.
-
-        ### Save the API Key in Your Environment
-
-        **macOS / Linux (bash / zsh):**
-
-        ```sh
-        export POSTMAN_API_KEY="PMAK-xxxxxxxxxxxxx"
-        ```
-
-        Or inline without exporting:
-
-        ```sh
-        POSTMAN_API_KEY="PMAK-xxxxxxxxxxxxx" postman collection run ...
-        ```
-
-        **Windows (PowerShell):**
-
-        Persist for future sessions:
-
-        ```powershell
-        setx POSTMAN_API_KEY "PMAK-xxxxxxxxxxxxx"
-        ```
-
-        For current session only:
-
-        ```powershell
-        $env:POSTMAN_API_KEY="PMAK-xxxxxxxxxxxxx"
-        ```
-
-        After setting the variable, you can either run `postman login` or execute any `postman` command directly. Authentication occurs automatically.
-
-4. Clone this repository or copy the files into your project.
-   The runner code is modularized under `lib/` (config parser, job parser, logger, runner).
-
----
-
-## Folder Structure
-
-```text
-project/
-├── config.json          # Configuration settings
-├── run.js               # Runner script
-├── collections/         # Place your .json collection exports here
-├── environments/        # Environment files
-└── results/             # Output from runs (auto-created)
+**Project structure:**
+```
+my-api-tests/
+├── collections/
+│   ├── auth-tests.postman_collection.json
+│   ├── api-tests.postman_collection.json
+│   └── integration-tests.postman_collection.json
+├── results/
+└── config.json
 ```
 
----
-
-## Configuration (config.json)
-
-Collections can be specified in three ways:
-
-1. **Folder mode** (default): Set `collectionsFolder`; all `*.json` files in that folder are run.
-2. **Explicit list**: Provide an array of file paths and/or cloud IDs in `collections`.
-3. **Per-collection environment & output**: Each entry may define its own `environment` and/or `output`.
-
-### Examples
-
-**Folder Mode**
-
-```json
-{
-  "collections": [
-    "./collections/foo.json",
-    {
-      "collection": "./collections/bar.json",
-      "environment": "./environments/uatEnv.json"
-    }
-  ],
-  "parallel": false
-}
-```
-
-**Full Configuration**
-
+**config.json:**
 ```json
 {
   "collectionsFolder": "./collections",
-  "collections": [
-    "./collections/foo.json",
-    {
-      "collection": "./collections/bar.json",
-      "environment": "./environments/uatEnv.json",
-      "output": "bar-results.json"
+  "parallel": true,
+  "reporters": ["cli", "json"],
+  "outputDir": "./results"
+}
+```
+
+**Run:**
+```bash
+postman-parallel
+```
+
+Results automatically appear in `./results`! 🎉
+
+---
+
+## 🔧 Available Commands
+
+```bash
+# Create config interactively
+postman-parallel --init
+
+# Validate your config
+postman-parallel --validate
+
+# Preview collections that will run
+postman-parallel --list
+
+# Run collections (default config.json)
+postman-parallel
+
+# Run with specific config
+postman-parallel --config ./my-config.json
+
+# Verbose logging for debugging
+postman-parallel --verbose
+
+# System diagnostics
+postman-parallel --doctor
+
+# Show help
+postman-parallel --help
+
+# Show version
+postman-parallel --version
+```
+
+---
+
+## 🌍 Use Cases
+
+**API Testing**
+- Test multiple API endpoints in parallel
+- Run comprehensive test suites efficiently
+
+**Multi-Environment Testing**
+- Run the same tests across dev, staging, and production
+- Verify behavior is consistent across environments
+
+**Regression Testing**
+- Execute large regression test suites
+- Control execution speed with concurrency limits
+
+**Smoke Tests**
+- Quick health checks after deployment
+- Fast feedback on critical functionality
+
+**CI/CD Integration**
+- Jenkins, GitHub Actions, Azure DevOps pipelines
+- Automated testing as part of deployment
+
+**Performance Testing**
+- Load test with multiple concurrent collections
+- Generate performance reports
+
+---
+
+## 💻 Platform Support
+
+- ✅ macOS
+- ✅ Linux
+- ✅ Windows
+- ✅ Docker
+- ✅ CI/CD Systems (GitHub Actions, Jenkins, Azure DevOps, GitLab CI)
+
+---
+
+## 🚀 Why This Tool?
+
+The Postman CLI alone cannot:
+- ❌ Use folder paths (only individual collections)
+- ❌ Configure parallel execution via config
+- ❌ Auto-discover collections in a folder
+- ❌ Manage multiple environments easily
+
+Our tool adds:
+- ✅ Folder-based collection discovery
+- ✅ Flexible parallel/sequential execution
+- ✅ Clean configuration-driven approach
+- ✅ Multiple reporter formats
+- ✅ Interactive setup wizard
+- ✅ Complete documentation
+
+---
+
+## 📖 Getting Help
+
+### Common Questions
+
+**Q: Where do I put my collections?**
+A: Create a `collections/` folder and export your Postman collections there. See [Quick Start](./docs/QUICK_START.md).
+
+**Q: How do I test multiple environments?**
+A: Use the explicit `collections` array in your config. See [Usage Examples](./docs/USAGE_EXAMPLES.md#example-2-multi-environment-testing).
+
+**Q: Can I use this in CI/CD?**
+A: Yes! See [Usage Examples](./docs/USAGE_EXAMPLES.md#example-6-cicd-integration-jenkins) for Jenkins, GitHub Actions, and Azure DevOps.
+
+**Q: I'm stuck. Where do I get help?**
+A: Check [Troubleshooting](./docs/TROUBLESHOOTING.md) or ask on [GitHub Discussions](https://github.com/Suban5/PostmanParallelCollectionRunner/discussions).
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+---
+
+## 🔗 Links
+
+- 📖 [Documentation](./docs/)
+- 🐛 [Report an Issue](https://github.com/Suban5/PostmanParallelCollectionRunner/issues)
+- 💬 [Discussions](https://github.com/Suban5/PostmanParallelCollectionRunner/discussions)
+- ⭐ [Star the Repository](https://github.com/Suban5/PostmanParallelCollectionRunner)
+
+---
+
+## 📊 Project Status
+
+- ✅ Version 1.0.1 - Foundation released
+- 📋 Phase 1 - npm distribution & core functionality complete
+- 🚀 Phase 2 - Documentation & user experience in progress
+- 🔜 Phase 3 - Advanced features and integrations planned
+
+---
+
+## 📦 Release & Publish
+
+Use these steps to prepare and publish to npm:
+
+```bash
+# 1) Run tests
+npm test
+
+# 2) Update package version (required)
+npm version 1.0.1 --no-git-tag-version
+
+# 3) Commit release changes
+git add .
+git commit -m "release: v1.0.1"
+
+# 4) Tag release
+git tag v1.0.1
+
+# 5) Publish to npm
+npm publish
+```
+
+For automatic patch bumps:
+
+```bash
+npm run version:patch
+```
+
+---
+
+## 🙏 Acknowledgments
+
+Built with ❤️ for the API testing community.
+
+---
+
+**Ready to get started?** → [Quick Start Guide](./docs/QUICK_START.md)
     },
     {
       "collection": "3186668-cloud-id",

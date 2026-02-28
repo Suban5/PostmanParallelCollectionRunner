@@ -1,0 +1,46 @@
+{
+  "name": "@suban5/postman-parallel-runner",
+  "version": "1.0.1",
+  "description": "Run multiple Postman collections in parallel from a single config file",
+  "main": "lib/runner.js",
+  "bin": {
+    "postman-parallel": "./run.js"
+  },
+  "files": [
+    "run.js",
+    "lib/",
+    "docs/",
+    "README.md"
+  ],
+  "preferGlobal": true,
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "lint": "echo \"Linting not configured yet\"",
+    "version:patch": "npm version patch --no-git-tag-version",
+    "release:patch": "npm version patch && npm publish"
+  },
+  "keywords": [
+    "postman",
+    "cli",
+    "api",
+    "testing",
+    "automation",
+    "parallel",
+    "runner",
+    "collections"
+  ],
+  "author": "suban5",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Suban5/PostmanParallelCollectionRunner"
+  },
+  "bugs": {
+    "url": "https://github.com/Suban5/PostmanParallelCollectionRunner/issues"
+  },
+  "homepage": "https://github.com/Suban5/PostmanParallelCollectionRunner#readme",
+  "dependencies": {}
+}

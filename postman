@@ -1,0 +1,4 @@
+#!/bin/bash
+# mock postman CLI for testing
+ echo "[mock] postman $@"
+ exit 0
