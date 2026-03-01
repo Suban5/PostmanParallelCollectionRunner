@@ -178,46 +178,67 @@ function handleDoctor() {
   const nodeVersion = process.version;
   logger.log('info', `✅ Node.js: ${nodeVersion}`);
 
-  // Check if Postman CLI executable is available in PATH
-  const postmanVersionCheck = spawnSync('postman', ['--version'], { encoding: 'utf8' });
-  if (postmanVersionCheck.status === 0) {
-    const version = (postmanVersionCheck.stdout || '').trim();
-    if (version) {
-      logger.log('info', `✅ Postman CLI: installed (${version})`);
+  // Check if Postman CLI executable is available in PATH (with OS-specific fallbacks)
+  const postmanCandidates = [
+    'postman',
+    'postman.cmd',
+    'postman.exe',
+    '/opt/homebrew/bin/postman',
+    '/usr/local/bin/postman',
+    '/snap/bin/postman'
+  ];
+  let postmanDetected = null;
+
+  for (const candidate of postmanCandidates) {
+    const check = spawnSync(candidate, ['--version'], { encoding: 'utf8' });
+    if (check.status === 0) {
+      postmanDetected = {
+        command: candidate,
+        version: (check.stdout || '').trim()
+      };
+      break;
+    }
+  }
+
+  if (postmanDetected) {
+    if (postmanDetected.version) {
+      logger.log('info', `✅ Postman CLI: installed (${postmanDetected.version})`);
     } else {
       logger.log('info', '✅ Postman CLI: installed');
     }
+    logger.log('info', `   Binary: ${postmanDetected.command}`);
   } else {
     logger.log('warn', '⚠️  Postman CLI: not found in PATH');
     logger.log('info', '   Install with: npm install -g postman-cli');
+    logger.log('info', `   PATH: ${process.env.PATH || '(empty)'}`);
   }
 
-  // Check if config exists
-  const configPath = path.resolve('./config.json');
-  const configExists = fs.existsSync(configPath);
-  let loadedConfig = null;
-  if (configExists) {
+  // Auto-detect config*.json files
+  const files = fs.readdirSync(process.cwd());
+  const configFiles = files.filter(f => /^config.*\.json$/.test(f));
+  let configFileUsed = null;
+  let hasWarningsOrErrors = false;
+  if (configFiles.length > 0) {
+    configFileUsed = configFiles[0];
     try {
-      loadedConfig = loadConfig(configPath);
-      logger.log('info', '✅ config.json: valid');
+      loadConfig(configFileUsed);
+      logger.log('info', `✅ ${configFileUsed}: valid`);
     } catch (err) {
-      logger.log('error', `❌ config.json: invalid (${err.message})`);
+      logger.log('error', `❌ ${configFileUsed}: invalid (${err.message})`);
+      hasWarningsOrErrors = true;
     }
   } else {
-    logger.log('warn', '⚠️  config.json: not found');
+    logger.log('warn', '⚠️  No config*.json file found');
     logger.log('info', '   Create one with: postman-parallel --init');
-  }
-
-  // Check if collections folder exists
-  const collectionsFolder = loadedConfig?.collectionsFolder || './collections';
-  if (fs.existsSync(collectionsFolder)) {
-    logger.log('info', `✅ Collections folder: ${collectionsFolder}`);
-  } else {
-    logger.log('warn', `⚠️  Collections folder: ${collectionsFolder} (not found)`);
+    hasWarningsOrErrors = true;
   }
 
   logger.log('info', '');
-  logger.log('info', 'Diagnostic complete. All systems operational! 🚀');
+  if (!hasWarningsOrErrors) {
+    logger.log('info', 'Diagnostic complete. All systems operational! 🚀');
+  } else {
+    logger.log('warn', 'Diagnostic complete. Issues detected above.');
+  }
   logger.log('info', '');
 }
 

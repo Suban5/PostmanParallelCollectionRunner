@@ -4,24 +4,6 @@ Run multiple Postman API collections in parallel from a single configuration fil
 
 <p align="center">
   <strong>Easy • Fast • Reliable</strong>
-</p>
-
----
-
-## ✨ Features
-
-- ✅ **Run collections in parallel** - Execute multiple collections simultaneously
-- ✅ **Simple configuration** - Single `config.json` file controls everything
-- ✅ **Multiple environments** - Test across dev, staging, and production
-- ✅ **Auto-discovery** - Automatically finds collections in a folder
-- ✅ **Flexible reporters** - CLI, JSON, HTML, and JUnit output formats
-- ✅ **Easy setup** - Interactive setup wizard with `--init` flag
-- ✅ **Global CLI** - Install once via npm, use everywhere
-
----
-
-## 📦 Installation
-
 ```bash
 npm install -g @suban5/postman-parallel-runner
 ```
@@ -109,7 +91,7 @@ my-api-tests/
 {
   "collectionsFolder": "./collections",
   "parallel": true,
-  "reporters": ["cli", "json"],
+  "reporters": "cli,json,html",
   "outputDir": "./results"
 }
 ```
@@ -119,7 +101,7 @@ my-api-tests/
 postman-parallel
 ```
 
-Results automatically appear in `./results`! 🎉
+This checks your Node.js version, Postman CLI availability, and config health (`config*.json` auto-detection in current directory).
 
 ---
 
@@ -248,9 +230,7 @@ MIT License - see LICENSE file for details
 
 ---
 
-## 🔗 Links
-
-- 📖 [Documentation](./docs/)
+Contributions are welcome! Open issues or submit pull requests. Modules can be swapped or tested individually.
 - 🐛 [Report an Issue](https://github.com/Suban5/PostmanParallelCollectionRunner/issues)
 - 💬 [Discussions](https://github.com/Suban5/PostmanParallelCollectionRunner/discussions)
 - ⭐ [Star the Repository](https://github.com/Suban5/PostmanParallelCollectionRunner)
@@ -259,7 +239,7 @@ MIT License - see LICENSE file for details
 
 ## 📊 Project Status
 
-- ✅ Version 1.0.1 - Foundation released
+- ✅ Version 1.0.2 - Diagnostics and config UX improvements
 - 📋 Phase 1 - npm distribution & core functionality complete
 - 🚀 Phase 2 - Documentation & user experience in progress
 - 🔜 Phase 3 - Advanced features and integrations planned
@@ -275,14 +255,14 @@ Use these steps to prepare and publish to npm:
 npm test
 
 # 2) Update package version (required)
-npm version 1.0.1 --no-git-tag-version
+npm version 1.0.2 --no-git-tag-version
 
 # 3) Commit release changes
 git add .
-git commit -m "release: v1.0.1"
+git commit -m "release: v1.0.2"
 
 # 4) Tag release
-git tag v1.0.1
+git tag v1.0.2
 
 # 5) Publish to npm
 npm publish
@@ -303,96 +283,6 @@ Built with ❤️ for the API testing community.
 ---
 
 **Ready to get started?** → [Quick Start Guide](./docs/QUICK_START.md)
-    },
-    {
-      "collection": "3186668-cloud-id",
-      "environment": "3186668-env-id"
-    }
-  ],
-  "environment": "./environments/testEnv.json",
-  "parallel": true,
-  "maxConcurrency": 3,
-  "reporters": "cli,json,html",
-  "exportResultsFolder": "./results"
-}
-```
-
-### Configuration Options
-
-- **`collectionsFolder`**: Directory containing collection JSON files.
-- **`collections`**: Array of jobs. Each element can be:
-  - A string (local path or cloud ID, uses global environment if defined)
-  - An object `{ collection, environment, output }`
-- **`environment`**: Global environment path or cloud ID (optional).
-- **`parallel`**: `true` for concurrent runs, `false` for sequential.
-- **`maxConcurrency`**: Non-negative integer. Limits concurrent runs when `parallel` is `true`. `0` or omitted = no cap.
-- **`reporters`**: Comma-separated reporter names (`cli`, `json`, `html`). JSON/HTML/JUnit files are saved to `exportResultsFolder`.
-- **`exportResultsFolder`**: Base directory where report files are written.
-
-**Note:** If both `collections` and `collectionsFolder` are set, `collections` takes precedence.
-
----
-
-## Running the Runner
-
-```sh
-node run.js                       # uses ./config.json
-node run.js --config config1.json # specify alternate config file
-node run.js --verbose             # enable debug logs
-```
-
-Sequential execution can be enforced:
-
-```json
-{"parallel": false}
-```
-
-The `--verbose` flag outputs detailed logs for each child process.
-
----
-
-## Using Postman Cloud IDs
-
-Cloud IDs allow you to run collections/environments without exporting them locally.
-
-### Find a Cloud ID
-
-**Postman App:**
-
-- Open the collection/environment
-- Click the three-dot menu next to its name and choose **View Details**
-- Copy the ID
-
-**Postman API:**
-
-```sh
-curl -H "X-API-Key: <your_key>" https://api.getpostman.com/collections
-```
-
-Parse the `uid` field from the JSON response.
-
-**Postman CLI:**
-
-```sh
-postman api get collections --environment <your_key>
-```
-
-### Sample Config with Cloud IDs
-
-```json
-{
-  "collections": [
-    "3186668-f695cab7-6878-eb55-7943-ad88e1ccfd65",
-    "3186668-18e4a184-d0f9-4f15-a0ae-fd430e544ff0"
-  ],
-  "environment": "3186668-c348c8ad-0003-482b-a965-dee211b75b2a",
-  "parallel": true,
-  "reporters": "cli",
-  "exportResultsFolder": "./results"
-}
-```
-
----
 
 ## Tips
 

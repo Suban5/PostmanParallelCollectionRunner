@@ -18,7 +18,7 @@ Or manually create it:
 {
   "collectionsFolder": "./collections",
   "parallel": true,
-  "reporters": ["cli", "json"],
+  "reporters": "cli,json,html",
   "outputDir": "./results"
 }
 ```
@@ -128,13 +128,13 @@ Maximum number of collections to run at once.
 
 ---
 
-### `reporters` (Array of Strings)
+### `reporters` (String)
 
 Output formats for test results.
 
 ```json
 {
-  "reporters": ["cli", "json", "html"]
+  "reporters": "cli,json,html"
 }
 ```
 
@@ -144,7 +144,7 @@ Output formats for test results.
 - `html` - HTML report (if using Newman)
 - `junit` - JUnit XML (CI/CD integration)
 
-**Default:** `["cli", "json"]`
+**Default:** `cli,json`
 
 ---
 
@@ -222,7 +222,7 @@ Alias for `outputDir` (for backward compatibility).
 {
   "collectionsFolder": "./collections",
   "parallel": true,
-  "reporters": ["cli", "json"],
+  "reporters": "cli,json",
   "outputDir": "./results"
 }
 ```
@@ -247,7 +247,7 @@ Alias for `outputDir` (for backward compatibility).
   ],
   "parallel": true,
   "maxConcurrency": 2,
-  "reporters": ["json", "html"],
+  "reporters": "json,html",
   "outputDir": "./results"
 }
 ```
@@ -258,7 +258,7 @@ Alias for `outputDir` (for backward compatibility).
 {
   "collectionsFolder": "./collections",
   "parallel": false,
-  "reporters": ["junit"],
+  "reporters": "junit",
   "outputDir": "./test-results",
   "environment": "./environments/ci.json"
 }
@@ -283,7 +283,7 @@ Alias for `outputDir` (for backward compatibility).
     }
   ],
   "parallel": true,
-  "reporters": ["json"],
+  "reporters": "json",
   "outputDir": "./results"
 }
 ```
@@ -295,7 +295,7 @@ Alias for `outputDir` (for backward compatibility).
   "collectionsFolder": "./collections",
   "parallel": true,
   "maxConcurrency": 2,
-  "reporters": ["cli", "json"],
+  "reporters": "cli,json",
   "outputDir": "./results"
 }
 ```

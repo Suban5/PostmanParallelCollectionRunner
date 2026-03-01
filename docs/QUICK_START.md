@@ -134,7 +134,6 @@ Output:
 ✅ Node.js: v18.12.0
 ✅ Postman CLI: installed (1.29.5)
 ✅ config.json: valid
-✅ Collections folder: ./collections
 
 Diagnostic complete. All systems operational! 🚀
 ```
@@ -163,7 +162,7 @@ postman-parallel --verbose
 {
   "collectionsFolder": "./collections",
   "parallel": true,
-  "reporters": ["cli", "json"],
+  "reporters": "cli,json",
   "outputDir": "./results"
 }
 ```
@@ -183,7 +182,7 @@ postman-parallel --verbose
     }
   ],
   "parallel": true,
-  "reporters": ["json", "html"],
+  "reporters": "json,html",
   "outputDir": "./results"
 }
 ```
@@ -195,7 +194,7 @@ postman-parallel --verbose
   "collectionsFolder": "./collections",
   "parallel": false,
   "maxConcurrency": 1,
-  "reporters": ["html"],
+  "reporters": "html",
   "outputDir": "./test-results"
 }
 ```

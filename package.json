@@ -1,6 +1,6 @@
 {
   "name": "@suban5/postman-parallel-runner",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Run multiple Postman collections in parallel from a single config file",
   "main": "lib/runner.js",
   "bin": {
