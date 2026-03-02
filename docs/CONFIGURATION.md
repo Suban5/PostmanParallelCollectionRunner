@@ -18,6 +18,7 @@ Or manually create it:
 {
   "collectionsFolder": "./collections",
   "parallel": true,
+  "continueOnError": true,
   "reporters": "cli,json,html",
   "outputDir": "./results"
 }
@@ -104,6 +105,24 @@ Run collections simultaneously or sequentially.
 **Examples:**
 - `true`: Run all collections at the same time (faster)
 - `false`: Run one collection at a time (slower, useful for resource-constrained systems)
+
+---
+
+### `continueOnError` (Boolean)
+
+Continue running remaining collections even if one collection fails.
+
+```json
+{
+  "continueOnError": true
+}
+```
+
+**Default:** `true` (when omitted)
+
+**Examples:**
+- `true`: Complete all collections and summarize failures at the end
+- `false`: Stop immediately on first failed collection (fail-fast)
 
 ---
 
@@ -222,6 +241,7 @@ Alias for `outputDir` (for backward compatibility).
 {
   "collectionsFolder": "./collections",
   "parallel": true,
+  "continueOnError": true,
   "reporters": "cli,json",
   "outputDir": "./results"
 }
@@ -246,6 +266,7 @@ Alias for `outputDir` (for backward compatibility).
     }
   ],
   "parallel": true,
+  "continueOnError": true,
   "maxConcurrency": 2,
   "reporters": "json,html",
   "outputDir": "./results"
@@ -258,6 +279,7 @@ Alias for `outputDir` (for backward compatibility).
 {
   "collectionsFolder": "./collections",
   "parallel": false,
+  "continueOnError": false,
   "reporters": "junit",
   "outputDir": "./test-results",
   "environment": "./environments/ci.json"
@@ -283,6 +305,7 @@ Alias for `outputDir` (for backward compatibility).
     }
   ],
   "parallel": true,
+  "continueOnError": true,
   "reporters": "json",
   "outputDir": "./results"
 }
@@ -294,6 +317,7 @@ Alias for `outputDir` (for backward compatibility).
 {
   "collectionsFolder": "./collections",
   "parallel": true,
+  "continueOnError": true,
   "maxConcurrency": 2,
   "reporters": "cli,json",
   "outputDir": "./results"

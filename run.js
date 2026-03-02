@@ -15,7 +15,7 @@ const packageJson = require('./package.json');
 const args = process.argv.slice(2);
 let cfgPath = './config.json';
 let verbose = false;
-let continueOnError = true;
+let continueOnError;
 
 // Handle flags that exit early
 for (let i = 0; i < args.length; i++) {
@@ -225,13 +225,39 @@ function handleDoctor() {
   // Auto-detect config*.json files
   const files = fs.readdirSync(process.cwd());
   const configFiles = files.filter(f => /^config.*\.json$/.test(f));
-  let configFileUsed = null;
   let hasWarningsOrErrors = false;
+
+  const collectionLooksLikeFilePath = (value) => {
+    if (!value || typeof value !== 'string') return false;
+    const looksLikeCloudId = !value.includes(path.sep) && !value.endsWith('.json');
+    if (looksLikeCloudId) return false;
+    return value.endsWith('.json') || value.includes(path.sep) || value.startsWith('.');
+  };
+
   if (configFiles.length > 0) {
-    configFileUsed = configFiles[0];
+    const configFileUsed = configFiles[0];
     try {
-      loadConfig(configFileUsed);
+      const cfg = loadConfig(configFileUsed);
       logger.log('info', `✅ ${configFileUsed}: valid`);
+
+      const jobs = parseJobs(cfg);
+      logger.log('info', `✅ Jobs parsed: ${jobs.length} collection(s)`);
+
+      let missingPaths = 0;
+      jobs.forEach(job => {
+        if (collectionLooksLikeFilePath(job.collection) && !fs.existsSync(path.resolve(job.collection))) {
+          missingPaths += 1;
+          logger.log('warn', `⚠️  Missing collection file: ${job.collection}`);
+        }
+        if (job.environment && collectionLooksLikeFilePath(job.environment) && !fs.existsSync(path.resolve(job.environment))) {
+          missingPaths += 1;
+          logger.log('warn', `⚠️  Missing environment file: ${job.environment}`);
+        }
+      });
+
+      if (missingPaths > 0) {
+        hasWarningsOrErrors = true;
+      }
     } catch (err) {
       logger.log('error', `❌ ${configFileUsed}: invalid (${err.message})`);
       hasWarningsOrErrors = true;
@@ -251,10 +277,11 @@ function handleDoctor() {
   logger.log('info', '');
 }
 
-function runDefault(cfgPath, continueOnErrorFlag = false) {
+function runDefault(cfgPath, continueOnErrorFlag) {
   let config;
   try {
     config = loadConfig(cfgPath);
+    logger.log('debug', `Config parsed successfully: ${path.resolve(cfgPath)}`);
   } catch (err) {
     logger.log('error', err.message);
     logger.log('error', '');
@@ -269,6 +296,13 @@ function runDefault(cfgPath, continueOnErrorFlag = false) {
   let jobs;
   try {
     jobs = parseJobs(config);
+    logger.log('debug', `Jobs parsed: ${jobs.length}`);
+    jobs.forEach((job, index) => {
+      logger.log(
+        'debug',
+        `job[${index}] collection=${job.collection}${job.environment ? ` environment=${job.environment}` : ''}${job.output ? ` output=${job.output}` : ''}`
+      );
+    });
   } catch (err) {
     logger.log('error', err.message);
     process.exit(1);
@@ -276,7 +310,12 @@ function runDefault(cfgPath, continueOnErrorFlag = false) {
 
   logger.log('info', `📂 Found ${jobs.length} collection(s):`, jobs.map(j => j.collection));
 
-  config.continueOnError = continueOnErrorFlag;
+  const effectiveContinueOnError =
+    typeof continueOnErrorFlag === 'boolean'
+      ? continueOnErrorFlag
+      : ('continueOnError' in config ? Boolean(config.continueOnError) : true);
+
+  config.continueOnError = effectiveContinueOnError;
   if (config.continueOnError) {
     logger.log('info', 'ℹ️  Continue-on-error is enabled');
   }

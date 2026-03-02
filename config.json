@@ -2,6 +2,7 @@
   "collectionsFolder": "./collections",
   "environment": "./environments/Test.postman_environment.json",
   "parallel": true,
+  "continueOnError": true,
   "reporters": "cli,html,json",
   "exportResultsFolder": "./results/simple"
 }

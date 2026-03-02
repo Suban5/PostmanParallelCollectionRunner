@@ -12,6 +12,7 @@
     }
   ],
   "parallel": true,
+  "continueOnError": true,
   "maxConcurrency": 2,                            
   "reporters": "cli,json,html",
   "exportResultsFolder": "./results/cloudIdResults"

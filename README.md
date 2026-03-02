@@ -82,6 +82,7 @@ Use these examples as starter files. Copy a template and adjust values such as `
 {
   "collectionsFolder": "./collections",
   "parallel": true,
+  "continueOnError": true,
   "reporters": "cli,json,html",
   "exportResultsFolder": "./results"
 }
@@ -104,6 +105,7 @@ Use these examples as starter files. Copy a template and adjust values such as `
     }
   ],
   "parallel": true,
+  "continueOnError": true,
   "maxConcurrency": 2,
   "reporters": "cli,json,html",
   "exportResultsFolder": "./results/multiEnv"
@@ -127,6 +129,7 @@ Use these examples as starter files. Copy a template and adjust values such as `
     }
   ],
   "parallel": true,
+  "continueOnError": true,
   "maxConcurrency": 2,
   "reporters": "cli,json,html",
   "exportResultsFolder": "./results/cloudIdResults"
@@ -150,6 +153,7 @@ Use these examples as starter files. Copy a template and adjust values such as `
     }
   ],
   "parallel": true,
+  "continueOnError": true,
   "maxConcurrency": 2,
   "reporters": "cli,json,html",
   "exportResultsFolder": "./results/customFolders"
@@ -176,6 +180,7 @@ You can add or remove optional fields based on your use case.
 
 - `environment` (global): default `pathToEnvironment` for all collections
 - `maxConcurrency`: limit parallel runs
+- `continueOnError`: continue remaining collections when one collection fails (default: `true` when omitted)
 - `output`: custom `filename` (or `folder/filename`) per collection
 - `exportResultsFolder`: custom `pathToResultsFolder`
 - `parallel`: set `false` for sequential execution

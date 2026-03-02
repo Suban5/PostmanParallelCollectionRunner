@@ -2,7 +2,9 @@ const specs = [
   require('./specs/reporters.spec'),
   require('./specs/validate-list.spec'),
   require('./specs/doctor.spec'),
-  require('./specs/init.spec')
+  require('./specs/init.spec'),
+  require('./specs/parser.spec'),
+  require('./specs/runner.spec')
 ];
 
 (async () => {

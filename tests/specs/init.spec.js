@@ -11,6 +11,7 @@ module.exports = {
       './collections',
       '',
       '',
+      '',
       'yes',
       './environments',
       '3',
@@ -28,6 +29,7 @@ module.exports = {
       const generatedConfig = JSON.parse(fs.readFileSync(generatedConfigPath, 'utf8'));
       assert.strictEqual(generatedConfig.collectionsFolder, './collections');
       assert.strictEqual(generatedConfig.parallel, true);
+      assert.strictEqual(generatedConfig.continueOnError, true);
       assert.strictEqual(generatedConfig.reporters, 'cli,html,json');
       assert.strictEqual(generatedConfig.outputDir, './results');
       assert.strictEqual(generatedConfig.environmentsFolder, './environments');

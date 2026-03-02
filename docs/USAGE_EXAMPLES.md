@@ -367,6 +367,7 @@ steps:
     }
   ],
   "parallel": true,
+  "continueOnError": true,
   "maxConcurrency": 2,
   "reporters": "json",
   "outputDir": "./results"
