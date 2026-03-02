@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  environment {
+    OUTPUT_DIR = 'results'
+  }
 
   parameters {
     string(name: 'CONFIG_PATH', defaultValue: 'config.json', description: 'Path to runner config file')
@@ -15,7 +18,7 @@ pipeline {
     stage('Install') {
       steps {
         sh 'npm install -g postman-cli'
-        sh 'npm install -g @suban5/postman-parallel-runner'
+        sh 'npm install -g @suban5/postman-parallel-runner@latest'
       }
     }
 
@@ -30,11 +33,23 @@ pipeline {
         sh 'postman-parallel --config "${CONFIG_PATH}"'
       }
     }
+
+    stage('Resolve Artifact Path') {
+      steps {
+        script {
+          env.OUTPUT_DIR = sh(
+            script: '''node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\\\/g,'/'));"''',
+            returnStdout: true
+          ).trim()
+          echo "Artifact source: ${env.OUTPUT_DIR}"
+        }
+      }
+    }
   }
 
   post {
     always {
-      archiveArtifacts artifacts: 'results/**', allowEmptyArchive: true
+      archiveArtifacts artifacts: "${env.OUTPUT_DIR}/**", allowEmptyArchive: true
     }
   }
 }

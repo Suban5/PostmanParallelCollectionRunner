@@ -22,7 +22,7 @@ steps:
 
   - script: |
       npm install -g postman-cli
-      npm install -g @suban5/postman-parallel-runner
+      npm install -g @suban5/postman-parallel-runner@latest
     displayName: Install Postman CLI + Runner
 
   - script: postman-parallel --validate "$(CONFIG_PATH)"
@@ -31,9 +31,18 @@ steps:
   - script: postman-parallel --config "$(CONFIG_PATH)"
     displayName: Run collections
 
+  - script: |
+      OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\/g,'/'));")
+      echo "Artifact source: $OUTPUT_DIR"
+      mkdir -p "$(Build.SourcesDirectory)/ci-artifacts"
+      if [ -d "$OUTPUT_DIR" ]; then
+        cp -R "$OUTPUT_DIR"/. "$(Build.SourcesDirectory)/ci-artifacts/"
+      fi
+    displayName: Prepare artifact folder
+
   - task: PublishPipelineArtifact@1
     condition: always()
     inputs:
-      targetPath: '$(Build.SourcesDirectory)/results'
+      targetPath: '$(Build.SourcesDirectory)/ci-artifacts'
       artifact: 'postman-results'
       publishLocation: 'pipeline'

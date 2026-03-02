@@ -247,7 +247,7 @@ cat results/*
 
 ## Example 6: CI/CD Integration (Jenkins)
 
-**Scenario:** Run in Jenkins pipeline, generate JUnit report
+**Scenario:** Run in Jenkins pipeline and archive artifacts from `exportResultsFolder`
 
 Template source: `docs/templates/ci.templates/jenkinsfile`
 
@@ -272,34 +272,62 @@ jenkins-tests/
     }
   ],
   "parallel": false,
-  "reporters": "junit",
-  "outputDir": "./test-results"
+  "reporters": "json,html",
+  "exportResultsFolder": "./results/jenkins"
 }
 ```
 
 **Jenkinsfile:**
 ```groovy
 pipeline {
+  environment {
+    OUTPUT_DIR = 'results'
+  }
+
+  parameters {
+    string(name: 'CONFIG_PATH', defaultValue: 'config.json', description: 'Path to runner config file')
+  }
+
   stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
     stage('Install') {
       steps {
-        sh 'npm install -g @suban5/postman-parallel-runner'
+        sh 'npm install -g postman-cli'
+        sh 'npm install -g @suban5/postman-parallel-runner@latest'
       }
     }
     stage('Validate') {
       steps {
-        sh 'postman-parallel --validate'
+        sh 'postman-parallel --validate "${CONFIG_PATH}"'
       }
     }
-    stage('Test') {
+    stage('Run') {
       steps {
-        sh 'postman-parallel'
+        sh 'postman-parallel --config "${CONFIG_PATH}"'
       }
     }
-    stage('Report') {
+
+    stage('Resolve Artifact Path') {
       steps {
-        junit 'test-results/**/*.xml'
+        script {
+          env.OUTPUT_DIR = sh(
+            script: '''node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\\\/g,'/'));"''',
+            returnStdout: true
+          ).trim()
+          echo "Artifact source: ${env.OUTPUT_DIR}"
+        }
       }
+    }
+  }
+
+  post {
+    always {
+      archiveArtifacts artifacts: "${env.OUTPUT_DIR}/**", allowEmptyArchive: true
     }
   }
 }
@@ -317,30 +345,52 @@ Template source: `docs/templates/ci.templates/azure-pipelines.yml`
 ```yaml
 trigger:
   - main
+  - master
+
+pr:
+  - main
+  - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
+
+variables:
+  CONFIG_PATH: config.json
 
 steps:
+- checkout: self
+
 - task: NodeTool@0
   inputs:
     versionSpec: '18.x'
+  displayName: Setup Node.js
 
-- script: npm install -g @suban5/postman-parallel-runner
-  displayName: 'Install Postman Parallel Runner'
+- script: |
+    npm install -g postman-cli
+    npm install -g @suban5/postman-parallel-runner@latest
+  displayName: Install Postman CLI + Runner
 
-- script: postman-parallel --validate
-  displayName: 'Validate Configuration'
+- script: postman-parallel --validate "$(CONFIG_PATH)"
+  displayName: Validate configuration
 
-- script: postman-parallel
-  displayName: 'Run Collections'
-  continueOnError: false
+- script: postman-parallel --config "$(CONFIG_PATH)"
+  displayName: Run collections
 
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: '**/test-results/*.xml'
+- script: |
+    OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\/g,'/'));")
+    echo "Artifact source: $OUTPUT_DIR"
+    mkdir -p "$(Build.SourcesDirectory)/ci-artifacts"
+    if [ -d "$OUTPUT_DIR" ]; then
+      cp -R "$OUTPUT_DIR"/. "$(Build.SourcesDirectory)/ci-artifacts/"
+    fi
+  displayName: Prepare artifact folder
+
+- task: PublishPipelineArtifact@1
   condition: always()
+  inputs:
+    targetPath: '$(Build.SourcesDirectory)/ci-artifacts'
+    artifact: 'postman-results'
+    publishLocation: 'pipeline'
 ```
 
 ---

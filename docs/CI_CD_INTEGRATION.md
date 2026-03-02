@@ -14,16 +14,16 @@ Use the ready-to-use CI/CD templates from `docs/templates/ci.templates/`.
 
 1. Copy the required template into your CI system's expected location.
 2. Ensure Node.js 18+ is available.
-3. Ensure `postman-cli` and `@suban5/postman-parallel-runner` are installed in the pipeline.
+3. Ensure `postman-cli` and `@suban5/postman-parallel-runner@latest` are installed in the pipeline.
 4. Set `CONFIG_PATH` (default: `config.json`) if your config file is elsewhere.
-5. Archive `results/` as a build artifact.
+5. Artifacts are uploaded from `exportResultsFolder` in your config file.
 
 ## Example Copy Commands
 
 ```bash
 # GitHub Actions
 mkdir -p .github/workflows
-cp docs/templates/ci.templates/github-actions.yml .github/workflows/postman-tests.yml
+cp docs/templates/ci.templates/github-actions.yml .github/workflows/github-actions.yml
 
 # GitLab
 cp docs/templates/ci.templates/gitlab-ci.yml .gitlab-ci.yml
@@ -34,3 +34,11 @@ cp docs/templates/ci.templates/azure-pipelines.yml azure-pipelines.yml
 # Jenkins
 cp docs/templates/ci.templates/jenkinsfile Jenkinsfile
 ```
+
+## Artifact Output Source
+
+All CI templates resolve artifact output from:
+
+`exportResultsFolder` in `CONFIG_PATH`
+
+If `exportResultsFolder` is not present, templates fall back to `./results`.

@@ -24,7 +24,7 @@ jobs:
       - name: Install Postman CLI + Runner
         run: |
           npm install -g postman-cli
-          npm install -g @suban5/postman-parallel-runner
+          npm install -g @suban5/postman-parallel-runner@latest
 
       - name: Validate configuration
         run: postman-parallel --validate "$CONFIG_PATH"
@@ -32,10 +32,17 @@ jobs:
       - name: Run collections
         run: postman-parallel --config "$CONFIG_PATH"
 
+      - name: Resolve artifact path from config
+        id: resolve_output
+        run: |
+          OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\/g,'/'));")
+          echo "dir=$OUTPUT_DIR" >> "$GITHUB_OUTPUT"
+          echo "Artifact source: $OUTPUT_DIR"
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: postman-results
-          path: results/**
+          path: ${{ steps.resolve_output.outputs.dir }}/**
           if-no-files-found: ignore

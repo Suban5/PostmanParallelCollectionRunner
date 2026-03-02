@@ -1,6 +1,6 @@
 # Postman Parallel Collection Runner
 
-Run multiple Postman API collections in parallel from one configuration file.
+Run multiple Postman API collections in parallel from one configuration file, locally or in CI/CD pipelines.
 
 ## Installation
 
@@ -44,6 +44,28 @@ postman-parallel
 ```
 
 Reports are written to `./results` by default.
+
+## CI/CD Pipeline Support
+
+This package supports running in CI/CD pipelines and includes ready-to-use templates for:
+
+- GitHub Actions
+- GitLab CI
+- Azure DevOps
+- Bamboo
+- Jenkins
+
+CI templates are available in:
+
+- `docs/templates/ci.templates/github-actions.yml`
+- `docs/templates/ci.templates/gitlab-ci.yml`
+- `docs/templates/ci.templates/azure-pipelines.yml`
+- `docs/templates/ci.templates/bamboo.yml`
+- `docs/templates/ci.templates/jenkinsfile`
+
+All CI templates install `@suban5/postman-parallel-runner@latest` and upload artifacts from `exportResultsFolder` in your config file (fallback: `./results`).
+
+For setup and copy commands, see `docs/CI_CD_INTEGRATION.md`.
 
 ## Usage
 
