@@ -29,6 +29,17 @@ jobs:
       - name: Validate configuration
         run: postman-parallel --validate "$CONFIG_PATH"
 
+      - name: Cleanup previous output folder
+        run: |
+          OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\/g,'/'));")
+          if [ -z "$OUTPUT_DIR" ]; then
+            echo "Resolved output folder is empty. Aborting."
+            exit 1
+          fi
+          echo "Cleaning output folder: $OUTPUT_DIR"
+          rm -rf "$OUTPUT_DIR"
+          mkdir -p "$OUTPUT_DIR"
+
       - name: Run collections
         run: postman-parallel --config "$CONFIG_PATH"
 

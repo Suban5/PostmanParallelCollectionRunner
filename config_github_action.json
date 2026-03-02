@@ -12,6 +12,6 @@
   "parallel": true,
   "continueOnError": true,
   "maxConcurrency": 3,
-  "reporters": "json,html",
+  "reporters": "html",
   "exportResultsFolder": "./results/githubActions"
 }

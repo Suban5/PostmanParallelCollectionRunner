@@ -42,3 +42,54 @@ All CI templates resolve artifact output from:
 `exportResultsFolder` in `CONFIG_PATH`
 
 If `exportResultsFolder` is not present, templates fall back to `./results`.
+
+## Manual Trigger Setup
+
+Use this setup if you want pipelines to run only when a user explicitly starts them.
+
+### GitHub Actions
+
+In `.github/workflows/github-actions.yml`, keep only:
+
+```yaml
+on:
+	workflow_dispatch:
+```
+
+Run manually from: **GitHub → Actions → Postman Parallel Tests → Run workflow**.
+
+### GitLab CI
+
+In `.gitlab-ci.yml`, add:
+
+```yaml
+workflow:
+	rules:
+		- if: '$CI_PIPELINE_SOURCE == "web"'
+		- when: never
+```
+
+Run manually from: **GitLab → CI/CD → Pipelines → Run pipeline**.
+
+### Azure DevOps
+
+In `azure-pipelines.yml`, set:
+
+```yaml
+trigger: none
+pr: none
+```
+
+Run manually from: **Azure DevOps → Pipelines → Run pipeline**.
+
+### Jenkins
+
+Use `Jenkinsfile` without SCM polling/webhook triggers.
+
+Run manually from: **Jenkins → Build Now** or **Build with Parameters**.
+
+### Bamboo
+
+Disable repository/commit triggers in the plan trigger settings.
+
+Run manually from: **Bamboo → Plan → Run**.
