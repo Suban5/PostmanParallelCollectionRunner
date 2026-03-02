@@ -377,7 +377,7 @@ steps:
   displayName: Run collections
 
 - script: |
-    OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\/g,'/'));")
+    OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replaceAll('\\\\','/'));")
     echo "Artifact source: $OUTPUT_DIR"
     mkdir -p "$(Build.SourcesDirectory)/ci-artifacts"
     if [ -d "$OUTPUT_DIR" ]; then

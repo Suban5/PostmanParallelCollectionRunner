@@ -26,7 +26,7 @@ Run Postman Parallel:
           - npm install -g @suban5/postman-parallel-runner@latest
           - postman-parallel --validate "${bamboo.CONFIG_PATH}"
           - postman-parallel --config "${bamboo.CONFIG_PATH}"
-          - OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replace(/\\/g,'/'));")
+          - OUTPUT_DIR=$(node -e "const fs=require('fs'); const p=process.env.CONFIG_PATH||'config.json'; const cfg=JSON.parse(fs.readFileSync(p,'utf8')); process.stdout.write((cfg.exportResultsFolder||'./results').replaceAll('\\\\','/'));")
           - echo "Artifact source: $OUTPUT_DIR"
           - mkdir -p ci-artifacts
           - if [ -d "$OUTPUT_DIR" ]; then cp -R "$OUTPUT_DIR"/. ci-artifacts/; fi
