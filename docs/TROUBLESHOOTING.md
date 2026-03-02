@@ -76,7 +76,7 @@ cat > config.json << 'EOF'
 {
   "collectionsFolder": "./collections",
   "parallel": true,
-  "reporters": ["cli", "json"],
+  "reporters": "cli,json",
   "outputDir": "./results"
 }
 EOF

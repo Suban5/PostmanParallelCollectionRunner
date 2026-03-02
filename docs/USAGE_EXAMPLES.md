@@ -24,7 +24,7 @@ api-tests/
 {
   "collectionsFolder": "./collections",
   "parallel": true,
-  "reporters": ["cli", "json"],
+  "reporters": "cli,json",
   "outputDir": "./results"
 }
 ```
@@ -81,7 +81,7 @@ multi-env-tests/
     }
   ],
   "parallel": true,
-  "reporters": ["json", "html"],
+  "reporters": "json,html",
   "outputDir": "./results"
 }
 ```
@@ -131,7 +131,7 @@ regression-tests/
   "collectionsFolder": "./collections",
   "environment": "./environments/test.postman_environment.json",
   "parallel": true,
-  "reporters": ["json", "html"],
+  "reporters": "json,html",
   "outputDir": "./results",
   "maxConcurrency": 2
 }
@@ -185,7 +185,7 @@ smoke-tests/
     }
   ],
   "parallel": true,
-  "reporters": ["json"],
+  "reporters": "json",
   "outputDir": "./results"
 }
 ```
@@ -229,7 +229,7 @@ performance-tests/
   "collectionsFolder": "./collections",
   "environment": "./environments/load-test.postman_environment.json",
   "parallel": true,
-  "reporters": ["json"],
+  "reporters": "json",
   "outputDir": "./results"
 }
 ```
@@ -270,7 +270,7 @@ jenkins-tests/
     }
   ],
   "parallel": false,
-  "reporters": ["junit"],
+  "reporters": "junit",
   "outputDir": "./test-results"
 }
 ```
@@ -368,7 +368,7 @@ steps:
   ],
   "parallel": true,
   "maxConcurrency": 2,
-  "reporters": ["json"],
+  "reporters": "json",
   "outputDir": "./results"
 }
 ```
