@@ -1,0 +1,9 @@
+{
+  "collectionsFolder": "./collections",
+  "environment": "./environments/Test.postman_environment.json",
+  "parallel": true,
+  "continueOnError": true,
+  "maxConcurrency": 3,
+  "reporters": "cli,json,html,junit",
+  "exportResultsFolder": "./results/regression"
+}

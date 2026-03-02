@@ -1,0 +1,6 @@
+{
+  "collectionsFolder": "./tests/fixtures/basic/collections",
+  "parallel": true,
+  "reporters": ["3"],
+  "exportResultsFolder": "./results/test-results"
+}

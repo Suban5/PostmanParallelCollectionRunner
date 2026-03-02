@@ -249,6 +249,8 @@ cat results/*
 
 **Scenario:** Run in Jenkins pipeline, generate JUnit report
 
+Template source: `docs/templates/ci.templates/jenkinsfile`
+
 **Project structure:**
 ```
 jenkins-tests/
@@ -308,6 +310,8 @@ pipeline {
 ## Example 7: Azure DevOps CI/CD
 
 **Scenario:** Run tests in Azure DevOps pipeline
+
+Template source: `docs/templates/ci.templates/azure-pipelines.yml`
 
 **azure-pipelines.yml:**
 ```yaml

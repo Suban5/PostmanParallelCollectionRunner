@@ -1,0 +1,35 @@
+---
+version: 2
+
+plan:
+  project-key: PPR
+  key: TEST
+  name: Postman Parallel Tests
+
+variables:
+  CONFIG_PATH: config.json
+
+stages:
+  - Validate and Run:
+      jobs:
+        - Run Postman Parallel
+
+Run Postman Parallel:
+  tasks:
+    - checkout:
+        force-clean-build: true
+
+    - script:
+        interpreter: SHELL
+        scripts:
+          - npm install -g postman-cli
+          - npm install -g @suban5/postman-parallel-runner
+          - postman-parallel --validate "${bamboo.CONFIG_PATH}"
+          - postman-parallel --config "${bamboo.CONFIG_PATH}"
+
+  artifacts:
+    - name: postman-results
+      location: results
+      pattern: "**/*"
+      shared: true
+      required: false

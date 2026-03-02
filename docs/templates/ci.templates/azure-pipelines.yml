@@ -1,0 +1,39 @@
+trigger:
+  - main
+  - master
+
+pr:
+  - main
+  - master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  CONFIG_PATH: config.json
+
+steps:
+  - checkout: self
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: Setup Node.js
+
+  - script: |
+      npm install -g postman-cli
+      npm install -g @suban5/postman-parallel-runner
+    displayName: Install Postman CLI + Runner
+
+  - script: postman-parallel --validate "$(CONFIG_PATH)"
+    displayName: Validate configuration
+
+  - script: postman-parallel --config "$(CONFIG_PATH)"
+    displayName: Run collections
+
+  - task: PublishPipelineArtifact@1
+    condition: always()
+    inputs:
+      targetPath: '$(Build.SourcesDirectory)/results'
+      artifact: 'postman-results'
+      publishLocation: 'pipeline'

@@ -13,3 +13,10 @@ Available templates:
 - `configs/config.regression.json`
 - `configs/config.smoke.json`
 - `configs/config.scheduled-nightly.json`
+
+CI/CD templates:
+- `ci.templates/github-actions.yml`
+- `ci.templates/gitlab-ci.yml`
+- `ci.templates/azure-pipelines.yml`
+- `ci.templates/bamboo.yml`
+- `ci.templates/jenkinsfile`

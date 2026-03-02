@@ -1,0 +1,40 @@
+pipeline {
+  agent any
+
+  parameters {
+    string(name: 'CONFIG_PATH', defaultValue: 'config.json', description: 'Path to runner config file')
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Install') {
+      steps {
+        sh 'npm install -g postman-cli'
+        sh 'npm install -g @suban5/postman-parallel-runner'
+      }
+    }
+
+    stage('Validate') {
+      steps {
+        sh 'postman-parallel --validate "${CONFIG_PATH}"'
+      }
+    }
+
+    stage('Run') {
+      steps {
+        sh 'postman-parallel --config "${CONFIG_PATH}"'
+      }
+    }
+  }
+
+  post {
+    always {
+      archiveArtifacts artifacts: 'results/**', allowEmptyArchive: true
+    }
+  }
+}

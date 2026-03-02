@@ -1,0 +1,9 @@
+{
+  "collectionsFolder": "./collections",
+  "environment": "./environments/UAT.postman_environment.json",
+  "parallel": true,
+  "continueOnError": true,
+  "maxConcurrency": 2,
+  "reporters": "cli,json,junit",
+  "exportResultsFolder": "./results/nightly"
+}

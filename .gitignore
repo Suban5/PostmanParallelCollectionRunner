@@ -41,9 +41,8 @@ QUICK_REFERENCE.md
 STRATEGY_INDEX.md
 
 # Test configs (keep one clean example)
-config*.json
-environments/
-collections/
+#environments/
+#collections/
 
 tests/1/*
 tests/2/*

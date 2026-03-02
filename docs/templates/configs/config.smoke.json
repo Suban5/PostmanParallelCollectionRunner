@@ -1,0 +1,11 @@
+{
+  "collections": [
+    "./collections/DummyJson API Test Collection.postman_collection.json"
+  ],
+  "environment": "./environments/Test.postman_environment.json",
+  "parallel": true,
+  "continueOnError": true,
+  "maxConcurrency": 1,
+  "reporters": "cli,json",
+  "exportResultsFolder": "./results/smoke"
+}

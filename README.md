@@ -64,6 +64,16 @@ postman-parallel --version   # Show installed CLI version
 postman-parallel --config ./config.json
 ```
 
+### GitHub Actions CI configuration
+
+Use `config_github_action.json` for GitHub Actions runs:
+
+```bash
+postman-parallel --config ./config_github_action.json
+```
+
+The GitHub workflow in `.github/workflows/github-actions.yml` is configured to use this file by default.
+
 `pathToConfig` can be either a relative path (for example `./config_simple.json`) or an absolute path (for example `C:/work/config_simple.json` on Windows).
 
 ### Continue running all collections after failures
@@ -189,6 +199,7 @@ You can add or remove optional fields based on your use case.
 
 - [Quick Start Guide](./docs/QUICK_START.md)
 - [Configuration Reference](./docs/CONFIGURATION.md)
+- [CI/CD Integration](./docs/CI_CD_INTEGRATION.md)
 - [Usage Examples](./docs/USAGE_EXAMPLES.md)
 - [Troubleshooting](./docs/TROUBLESHOOTING.md)
 

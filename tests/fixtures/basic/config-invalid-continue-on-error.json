@@ -1,0 +1,9 @@
+{
+  "collections": [
+    "./tests/fixtures/basic/collections/sample.postman_collection.json"
+  ],
+  "parallel": true,
+  "continueOnError": "yes",
+  "reporters": "cli,json",
+  "exportResultsFolder": "./tests/fixtures/basic/results"
+}

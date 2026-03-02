@@ -1,0 +1,8 @@
+{
+  "collectionsFolder": "./collections",
+  "environment": "./environments/Test.postman_environment.json",
+  "parallel": false,
+  "continueOnError": true,
+  "reporters": "cli,json",
+  "exportResultsFolder": "./results/single-environment"
+}

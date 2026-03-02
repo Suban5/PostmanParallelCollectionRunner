@@ -1,0 +1,17 @@
+{
+  "collectionsFolder": "./collections",
+  "collections": [
+    "./collections/DummyJson API Test Collection.postman_collection.json",
+    {
+      "collection": "./collections/FakeStore API CRUD with Authentication.postman_collection.json",
+      "environment": "./environments/UAT.postman_environment.json",
+      "output": "githubActions2/fakestore-uat"
+    }
+  ],
+  "environment": "./environments/Test.postman_environment.json",
+  "parallel": true,
+  "continueOnError": true,
+  "maxConcurrency": 3,
+  "reporters": "json,html",
+  "exportResultsFolder": "./results/githubActions"
+}

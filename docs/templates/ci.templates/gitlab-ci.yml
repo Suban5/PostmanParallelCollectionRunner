@@ -1,0 +1,27 @@
+stages:
+  - validate
+  - test
+
+variables:
+  CONFIG_PATH: "config.json"
+
+postman:validate:
+  stage: validate
+  image: node:18-alpine
+  script:
+    - npm install -g postman-cli
+    - npm install -g @suban5/postman-parallel-runner
+    - postman-parallel --validate "$CONFIG_PATH"
+
+postman:test:
+  stage: test
+  image: node:18-alpine
+  script:
+    - npm install -g postman-cli
+    - npm install -g @suban5/postman-parallel-runner
+    - postman-parallel --config "$CONFIG_PATH"
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - results/
