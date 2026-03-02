@@ -15,6 +15,7 @@ const packageJson = require('./package.json');
 const args = process.argv.slice(2);
 let cfgPath = './config.json';
 let verbose = false;
+let continueOnError = true;
 
 // Handle flags that exit early
 for (let i = 0; i < args.length; i++) {
@@ -56,13 +57,15 @@ for (let i = 0; i < args.length; i++) {
     cfgPath = args[++i];
   } else if (a === '--verbose') {
     verbose = true;
+  } else if (a === '--continue-on-error') {
+    continueOnError = true;
   }
 }
 
 logger.setLevel(verbose);
 
 // Default: run collections
-runDefault(cfgPath);
+runDefault(cfgPath, continueOnError);
 
 // ============= Helper Functions =============
 
@@ -79,6 +82,7 @@ Options:
   --validate [path]      Validate config file
   --list [path]          List available collections
   --doctor               Diagnostic check
+  --continue-on-error    Continue running other collections after a failure
   --verbose              Show detailed logs
   --help, -h             Show this help
   --version              Show version
@@ -87,6 +91,7 @@ Examples:
   postman-parallel --init              # Create config interactively
   postman-parallel                     # Run with default config
   postman-parallel -c ./config.json    # Run with specific config
+  postman-parallel --continue-on-error # Run all collections, even if one fails
   postman-parallel --validate          # Check config validity
   postman-parallel --list              # Show collections
 
@@ -130,7 +135,11 @@ function handleValidate(configPath) {
     logger.log('info', '');
     logger.log('info', '✅ Configuration is valid!');
     logger.log('info', `📄 Config file: ${path.resolve(configPath)}`);
-    logger.log('info', `📂 Collections folder: ${config.collectionsFolder || 'auto-discover'}`);
+    if (config.collectionsFolder) {
+      logger.log('info', `📂 Collections folder: ${config.collectionsFolder}`);
+    } else if (Array.isArray(config.collections)) {
+      logger.log('info', `📂 Collections source: explicit list (${config.collections.length} item(s))`);
+    }
     logger.log('info', `🚀 Collections to run: ${jobs.length}`);
     logger.log('info', `⚡ Parallel mode: ${config.parallel ? 'enabled' : 'disabled'}`);
     logger.log('info', `📊 Reporters: ${config.reporters || 'cli'}`);
@@ -242,7 +251,7 @@ function handleDoctor() {
   logger.log('info', '');
 }
 
-function runDefault(cfgPath) {
+function runDefault(cfgPath, continueOnErrorFlag = false) {
   let config;
   try {
     config = loadConfig(cfgPath);
@@ -266,6 +275,11 @@ function runDefault(cfgPath) {
   }
 
   logger.log('info', `📂 Found ${jobs.length} collection(s):`, jobs.map(j => j.collection));
+
+  config.continueOnError = continueOnErrorFlag;
+  if (config.continueOnError) {
+    logger.log('info', 'ℹ️  Continue-on-error is enabled');
+  }
 
   runJobs(jobs, config)
     .then(() => {

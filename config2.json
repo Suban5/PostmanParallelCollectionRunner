@@ -3,12 +3,12 @@
     {
       "collection": "./collections/DummyJson API Test Collection.postman_collection.json",
       "environment": "./environments/Test.postman_environment.json",
-      "output": "dummyJsonResults"
+      "output": "testfolder1/dummyJsonResults"
     },
     {
       "collection": "./collections/FakeStore API CRUD with Authentication.postman_collection.json",
       "environment": "./environments/UAT.postman_environment.json",
-      "output": "fakeStoreResults"
+      "output": "testfolder2/fakeStoreResults"
     }
   ],
   "parallel": true,

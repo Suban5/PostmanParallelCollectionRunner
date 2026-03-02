@@ -44,3 +44,6 @@ STRATEGY_INDEX.md
 config*.json
 environments/
 collections/
+
+tests/1/*
+tests/123/*
